@@ -1,0 +1,43 @@
+<odoo>
+    <record id="view_odoo_data_sync_wizard_form" model="ir.ui.view">
+        <field name="name">odoo.data.sync.wizard.form</field>
+        <field name="model">odoo.data.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Odoo Data Sync Wizard">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="data_sync_id" invisible="1"/>
+                            <field name="model_name" invisible="1" force_save="1"/>
+                            <field name="model_id"
+                                   context="{'from_data_sync_model': True}"
+                                   options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="domain" options="{'model': 'model_name'}" widget="domain"
+                                   context="{'check_portal_model': True}"/>
+                        </group>
+                        <group>
+                            <field name="only_main" string="Only Main Model?"/>
+                            <field name="main_thread"/>
+                            <field name="sub_thread"/>
+                        </group>
+                    </group>
+                    <notebook invisible="only_main">
+                        <page string="Related Models">
+                            <field name="line_ids" string="Related Models">
+                                <tree editable="bottom">
+                                    <field name="model_id"
+                                           context="{'from_data_sync_model': True}"
+                                           options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Sync" type="object" name="process_sync_selected_models" class="btn-primary" />
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

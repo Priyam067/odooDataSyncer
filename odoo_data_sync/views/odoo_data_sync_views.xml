@@ -1,0 +1,40 @@
+<odoo>
+    <!-- Action to open the Sync Wizard -->
+    <record id="odoo_data_sync_action" model="ir.actions.act_window">
+        <field name="name">Odoo Data Synchronization</field>
+        <field name="res_model">odoo.data.sync</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                Use this form to synchronize HR-related data from another Odoo instance.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item to access the Sync Action -->
+    <menuitem id="menu_odoo_data_sync"
+              name="Odoo Data Sync"
+              action="odoo_data_sync_action"
+              sequence="20"/>
+
+    <!-- Form View for the Sync Model -->
+    <record id="view_odoo_data_sync_form" model="ir.ui.view">
+        <field name="name">odoo.data.sync.form</field>
+        <field name="model">odoo.data.sync</field>
+        <field name="arch" type="xml">
+            <form string="HR Data Synchronization">
+                <header>
+                    <button string="Data Sync" type="object" name="open_data_sync_wizard" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="source_url" placeholder="https://source-odoo-instance.com" password="True" required="1"/>
+                        <field name="source_db" placeholder="Database name" password="True" required="1"/>
+                        <field name="source_username" placeholder="admin@example.com" password="True" required="1"/>
+                        <field name="source_password" password="True" required="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
