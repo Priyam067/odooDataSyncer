@@ -10,6 +10,7 @@ class OdooDataSyncWizard(models.TransientModel):
     model_id = fields.Many2one('ir.model', string='Model', required=True)
     line_ids = fields.One2many('odoo.data.sync.wizard.line', 'data_sync_wizard_id', 'Related Models')
     only_main = fields.Boolean(default=True)
+    only_create = fields.Boolean(default=False)
     main_thread = fields.Integer('Main Thread', default=1000)
     sub_thread = fields.Integer('Sub Thread', default=100)
     domain = fields.Text(default='[]', required=True)
@@ -32,7 +33,7 @@ class OdooDataSyncWizard(models.TransientModel):
         selected_models = list(set(self.line_ids.mapped('model_id.model')))
         selected_models.append(self.model_id.model)
         domain = safe_eval.safe_eval(self.sudo().domain)
-        self.data_sync_id.sync_all(list(selected_models), self.main_thread, self.sub_thread, domain)
+        self.data_sync_id.sync_all(list(selected_models), self.main_thread, self.sub_thread, domain, self.only_create)
 
 
 class OdooDataSyncWizardLine(models.TransientModel):

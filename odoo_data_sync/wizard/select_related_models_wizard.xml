@@ -17,6 +17,7 @@
                         </group>
                         <group>
                             <field name="only_main" string="Only Main Model?"/>
+                            <field name="only_create" string="Only Create New records?"/>
                             <field name="main_thread"/>
                             <field name="sub_thread"/>
                         </group>

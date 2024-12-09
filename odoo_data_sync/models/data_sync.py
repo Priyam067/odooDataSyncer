@@ -46,10 +46,10 @@ class OdooDataSync(models.Model):
             'context': {'default_data_sync_id': self.id}
         }
 
-    def sync_all(self, selected_model_ids, main_thread, sub_thread, domain):
+    def sync_all(self, selected_model_ids, main_thread, sub_thread, domain, only_create):
         for model in selected_model_ids:
             _logger.info(f"Syncing model ::::::::::::::::::: {model}")
-            self._sync_model(model, main_batch_size=main_thread, sub_batch_size=sub_thread, search_domain=domain)
+            self._sync_model(model, main_batch_size=main_thread, sub_batch_size=sub_thread, search_domain=domain, only_create=only_create)
             _logger.info(f"completed Syncing model ::::::::::::::: {model}")
 
 
@@ -73,7 +73,7 @@ class OdooDataSync(models.Model):
         """
         return self.env['ir.model.fields'].search([
             ('model', '=', model_name),
-            ('ttype', 'not in', ('many2many', 'binary', 'image', 'reference')),
+            ('ttype', 'not in', ('binary', 'image', 'reference')),
             ('store', '=', True),
         ])
 
@@ -108,11 +108,10 @@ class OdooDataSync(models.Model):
             if synced_record:
                 return synced_record.id
             if related_model == 'uo.uom' and not synced_record:
-                print("=====================>", related_ids[0])
         return False
 
 
-    def _sync_model(self, model_name, local_model=False, search_domain=False, match_field='x_old_id_custom', main_batch_size=1000, sub_batch_size=100):
+    def _sync_model(self, model_name, local_model=False, search_domain=False, match_field='x_old_id_custom', main_batch_size=1000, sub_batch_size=100, only_create=False):
         """
         Generic method to sync any model from the source to the current instance dynamically.
         """
@@ -139,7 +138,7 @@ class OdooDataSync(models.Model):
             search_domain = expression.AND([search_domain, ["|", ('company_id', '!=', False),  ('company_id', '=', False)]])
         fields_to_sync = [fl for fl in all_fields.mapped('name') if fl in tuple(server_fields.keys())]
         m2o_fields = all_fields.filtered(lambda x: x.ttype == 'many2one').mapped('name')
-        o2m_fields = all_fields.filtered(lambda y: y.ttype == 'one2many').mapped('name')
+        o2m_fields = all_fields.filtered(lambda y: y.ttype in ('one2many', 'many2many')).mapped('name')
 
         # Fetch records from the source
         record_ids = models_server.execute_kw(self.source_db, uid, self.source_password, model_name, 'search', [search_domain])
@@ -177,6 +176,8 @@ class OdooDataSync(models.Model):
                         if value_to_pass:
                             record[field] = value_to_pass
                 if local_record:
+                    if only_create:
+                        continue
                     vals_write = {field: record[field] for field in fields_to_sync if
                                   field in record and field in fields_to_sync}
                     local_record.write(vals_write)
