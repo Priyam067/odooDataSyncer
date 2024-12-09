@@ -107,7 +107,6 @@ class OdooDataSync(models.Model):
                 synced_record = self.cache_data[related_model][related_ids[0]]
             if synced_record:
                 return synced_record.id
-            if related_model == 'uo.uom' and not synced_record:
         return False
 
 
